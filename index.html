@@ -2,20 +2,19 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>大鱼丸电竞 - 哈弗币出租</title>
+  <title>大鱼丸电竞 · 哈弗币出租</title>
   <style>
     * {box-sizing: border-box;margin: 0;padding: 0;font-family: "Microsoft YaHei", sans-serif;}
-    body {background: #1a1a1d;color: #eee;padding: 20px;max-width: 600px;margin: 0 auto;}
+    body {background: #1a1a1a;color: #eee;padding: 20px;max-width: 600px;margin: 0 auto;}
     .container {background: #28282f;padding: 25px;border-radius: 12px;}
-    h1 {text-align: center;color: #ffcc00;margin-bottom: 20px;font-size: 22px;}
+    h1 {text-align: center;color: #ffcc00;margin-bottom: 20px;font-size:22px;}
     .section {margin-bottom: 18px;}
     label {display: block;margin-bottom: 6px;font-weight: bold;color: #ddd;}
     select, input, button {width: 100%;padding: 10px;border-radius: 6px;border: none;font-size: 15px;}
     select, input {background: #3c3c44;color: #fff;}
     button {background: #ff4444;color: #fff;font-weight: bold;cursor: pointer;margin-top: 10px;}
     button:hover {background: #ff2222;}
-    .result {margin-top: 25px;padding: 15px;background: #1f1f25;border-radius: 8px;font-size: 16px;line-height: 1.6;}
+    .result {margin-top: 25px;padding: 15px;background: #1f1f25;border-radius: 8px;font-size: 16px;line-height: 1.6;white-space: pre-wrap;}
     .result strong {color: #ffcc00;font-size: 18px;}
     .tip {font-size: 13px;color: #aaa;margin-top: 5px;}
     .skin-group {display: flex;flex-wrap: wrap;gap: 8px;margin-top: 6px;}
@@ -23,11 +22,87 @@
     .skin-item.active {background: #ffcc00;color: #000;font-weight: bold;}
     #copyBtn {background: #00c853;margin-top: 12px;display: none;}
     #copyBtn:hover {background: #00a800;}
+    #fillFormBtn {background: #1E88E5;margin-top:10px;display:none;}
+
+    /* 强制阅读公告 */
+    .modal {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.9); z-index: 9999;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .modal-box {
+      background: #222; color: #fff; width: 92%; max-width: 550px;
+      padding: 25px; border-radius: 14px; text-align: left;
+      line-height: 1.7; font-size: 15px; max-height: 85vh; overflow-y: auto;
+    }
+    .modal-box h2 {
+      text-align: center; color: #ffcc00;margin-bottom: 18px;
+      font-size: 20px; border-bottom: 1px solid #444; padding-bottom: 10px;
+    }
+    .modal-box p { margin: 10px 0; }
+    .modal-box .title { color: #ffcc00; font-weight: bold; font-size: 16px; margin-top: 15px; }
+    .modal-box .warn { color: #ff4444; font-weight: bold; }
+    #closeBtn {
+      background: #ff4444; color: #fff; padding: 12px; border-radius: 8px;
+      font-size: 16px; margin-top: 20px; cursor: not-allowed; opacity: 0.6;
+      border: none; width: 100%;
+    }
+    #closeBtn.enabled {
+      cursor: pointer; opacity: 1; background: #00c853;
+    }
   </style>
 </head>
 <body>
+
+<!-- ====================== 完整原版公告，只改了你指定的那一句话！ ====================== -->
+<div id="noticeModal" class="modal">
+  <div class="modal-box">
+    <h2>📢 DYW俱乐部 · 估价公告</h2>
+
+    <p>1：本页面仅供估价使用，实际价格根据打手使用情况进行计算</p>
+
+    <p>2：结算计算方式：<strong>纯币估价 + 使用装备金额 = 结算金额</strong></p>
+
+    <p>3：租期按每日最低消耗10m哈弗币计算，超出租期号主可强制结算；<br>
+    如后续打手想要续期需与号主协商；<br>
+    卡放卡包默认赠送，卡放仓库默认打手不可使用，使用折合哈夫币</p>
+
+    <p>4：实名人脸非本人，不予回收</p>
+
+    <p class="warn">如若后续出租过程中无法解除冻结或者高危人脸，仅仅按照实际使用的70%计算</p>
+
+    <p>5：请确保账号在90天之内没有超过3天的封禁记录，并且没有超过30天以上的封号记录，若后续发现将不予结算</p>
+
+    <div class="title">🧾 额外物品收费标准</div>
+    <p>6甲：2元</p>
+    <p>6头：1.5元</p>
+    <p>6级子弹：5元1组</p>
+    <p>AWM：0.7元1发</p>
+    <p>5级全装包：3元</p>
+    <p>9格体验卡：3元/天</p>
+    <p>咖啡豆：3元一个</p>
+    
+    <p class="warn" style="margin-top:10px;">⚠️ 6甲耐久损耗不低于5点、6头耐久损耗不低于2点，超出损耗标准默认不使用不计费，出租后请与租客进行协商</p>
+    
+    <p class="warn">此类物品有使用将会另外加价</p>
+
+    <button id="closeBtn" disabled>请阅读3秒后关闭 (3)</button>
+  </div>
+</div>
+<!-- ====================== 公告结束 ====================== -->
+
 <div class="container">
   <h1>大鱼丸电竞 · 哈弗币出租</h1>
+  
+  <div class="section">
+    <label>登录方式</label>
+    <select id="loginType">
+      <option value="qq_sm">QQ扫码</option>
+      <option value="qq_zm">QQ账密（更容易出租）</option>
+      <option value="wx_sm">微信扫码</option>
+    </select>
+  </div>
+
   <div class="section">
     <label>保险箱格数</label>
     <select id="safeType">
@@ -37,19 +112,30 @@
       <option value="2">2格保险箱</option>
     </select>
   </div>
+
   <div class="section">
     <label>体力等级</label>
     <select id="tiLi">
       <option value="7">7级</option><option value="6">6级</option><option value="5">5级</option><option value="4">4级</option>
     </select>
   </div>
+
   <div class="section">
     <label>负重等级</label>
     <select id="fuZhong">
       <option value="7">7级</option><option value="6">6级</option><option value="5">5级</option><option value="4">4级</option>
     </select>
   </div>
-  <div class="section" id="daoPiSection">
+
+  <div class="section">
+    <label>是否有砖皮</label>
+    <select id="zhuanPi">
+      <option value="no">无</option>
+      <option value="yes">有</option>
+    </select>
+  </div>
+
+  <div class="section">
     <label>付费刀皮</label>
     <div class="skin-group">
       <div class="skin-item">赤霄</div><div class="skin-item">怜悯</div><div class="skin-item">影锋</div><div class="skin-item">黑海</div>
@@ -57,7 +143,8 @@
     </div>
     <div class="tip">可多选</div>
   </div>
-  <div class="section" id="redPiSection">
+
+  <div class="section">
     <label>角色红皮</label>
     <div class="skin-group">
       <div class="skin-item">能天使</div><div class="skin-item">黑·天际线</div><div class="skin-item">水墨云图</div>
@@ -65,50 +152,96 @@
     </div>
     <div class="tip">可多选</div>
   </div>
+
   <div class="section">
-    <label>武器砖皮</label>
-    <select id="zhuanPi"><option value="yes">有</option><option value="no">无</option></select>
+    <label>总资产数量（m）</label>
+    <input type="number" id="totalAsset" placeholder="输入总资产" min="0">
   </div>
+
   <div class="section">
     <label>哈弗币数量（m）</label>
     <input type="number" id="coin" placeholder="输入数字" min="0">
     <div class="tip">1m = 100万</div>
   </div>
+
+  <div class="section">
+    <label>6甲数量（个）</label>
+    <input type="number" id="armor6" value="0" min="0">
+  </div>
+
+  <div class="section">
+    <label>6头数量（个）</label>
+    <input type="number" id="head6" value="0" min="0">
+  </div>
+
+  <div class="section">
+    <label>AWM子弹数量（发）</label>
+    <input type="number" id="awm" value="0" min="0">
+  </div>
+
   <button onclick="calc()">立即计算</button>
   <div class="result" id="result" style="display:none;"></div>
   <button id="copyBtn" onclick="copyResult()">📋 一键复制结果</button>
+  <button id="fillFormBtn" onclick="fillToForm()">📝 一键填写到表单</button>
 </div>
+
 <script>
-const allSkinItems = document.querySelectorAll('.skin-item');
-allSkinItems.forEach(item => {
-  item.addEventListener('click', () => {
-    item.classList.toggle('active');
-  });
+// 表单配置
+const FORM_URL = "https://example.com/form";
+const FORM_INPUT_ID = "input1";
+
+// 强制阅读3秒
+let countdown = 3;
+const closeBtn = document.getElementById('closeBtn');
+const modal = document.getElementById('noticeModal');
+const timer = setInterval(() => {
+  countdown--;
+  if (countdown > 0) {
+    closeBtn.innerText = `请阅读3秒后关闭 (${countdown})`;
+  } else {
+    clearInterval(timer);
+    closeBtn.disabled = false;
+    closeBtn.classList.add('enabled');
+    closeBtn.innerText = '我已知晓，关闭公告';
+  }
+}, 1000);
+closeBtn.onclick = () => { modal.style.display = 'none'; };
+
+// 皮肤选择
+document.querySelectorAll('.skin-item').forEach(item => {
+  item.addEventListener('click', () => item.classList.toggle('active'));
 });
 
 let resultText = '';
+let showText = '';
 
 function calc() {
+  const loginType = document.getElementById('loginType').selectedOptions[0].text;
   const safeType = document.getElementById('safeType').value;
   const tiLi = parseInt(document.getElementById('tiLi').value);
   const fuZhong = parseInt(document.getElementById('fuZhong').value);
   const zhuanPi = document.getElementById('zhuanPi').value;
+  const totalAsset = parseFloat(document.getElementById('totalAsset').value) || 0;
   const coin = parseFloat(document.getElementById('coin').value) || 0;
+  const armor6 = parseInt(document.getElementById('armor6').value) || 0;
+  const head6 = parseInt(document.getElementById('head6').value) || 0;
+  const awm = parseInt(document.getElementById('awm').value) || 0;
 
   const daoPiList = Array.from(document.querySelectorAll('#daoPiSection .skin-item.active')).map(i => i.textContent);
   const redPiList = Array.from(document.querySelectorAll('#redPiSection .skin-item.active')).map(i => i.textContent);
-  const daoPiText = daoPiList.length > 0 ? daoPiList.join('、') : '无';
-  const redPiText = redPiList.length > 0 ? redPiList.join('、') : '无';
   const zhuanPiText = zhuanPi === 'yes' ? '有' : '无';
-
   const hasDaoPi = daoPiList.length >= 1;
   const hasTwoRed = redPiList.length >= 2;
   const totalLevel = tiLi + fuZhong;
 
+  const armorMoney = armor6 * 2;
+  const headMoney = head6 * 1.5;
+  const awmMoney = awm * 0.7;
+  const otherTotal = armorMoney + headMoney + awmMoney;
+
   let base;
   if (safeType === '9') base = 40;
   else if (safeType === '6') base = 43;
-  else if (safeType === '4') base = 46;
   else base = 46;
 
   let minus = 0;
@@ -116,52 +249,76 @@ function calc() {
   if (hasDaoPi) minus += 1;
   if (hasTwoRed) minus += 1;
   if (zhuanPi === 'yes') minus += 1;
-
-  let rate = base - minus;
+  const rate = base - minus;
 
   if (tiLi < 4 || fuZhong < 4) {
-    resultText = `❌ 体力/负重低于4级，不予出租`;
-    document.getElementById('result').innerHTML = resultText;
-    document.getElementById('result').style.display = 'block';
-    document.getElementById('copyBtn').style.display = 'none';
-    return;
+    showText = resultText = '❌ 体力/负重低于4级，不予出租';
+    show(); return;
   }
-
   if (coin < 25) {
-    resultText = `❌ 哈弗币低于25m，不予出租`;
-    document.getElementById('result').innerHTML = resultText;
-    document.getElementById('result').style.display = 'block';
-    document.getElementById('copyBtn').style.display = 'none';
-    return;
+    showText = resultText = '❌ 哈弗币低于25m，不予出租';
+    show(); return;
   }
 
-  const money = (coin * 100 / rate).toFixed(2);
-  resultText = `
-保险箱：${safeType}格
-体力等级：${tiLi}级
-负重等级：${fuZhong}级
-付费刀皮：${daoPiText}
-角色红皮：${redPiText}
-武器砖皮：${zhuanPiText}
-哈弗币：${coin}m
-出租比例：1:${rate}
-出租价格：${money}元`.trim();
+  const coinMoney = (coin * 100 / rate).toFixed(2);
+  const total = (parseFloat(coinMoney) + otherTotal).toFixed(2);
 
-  let html = `✅ 出租比例：<strong>1:${rate}</strong><br>💰 哈弗币：${coin} m<br>💰 出租价格：<strong>${money} 元</strong>`;
-  document.getElementById('result').innerHTML = html;
-  document.getElementById('result').style.display = 'block';
-  document.getElementById('copyBtn').style.display = 'block';
+  // 复制内容：从登录方式开始，完整信息
+  let copyArr = [
+    `登录方式：${loginType}`,
+    `保险箱：${safeType}格`,
+    `体力等级：${tiLi}级`,
+    `负重等级：${fuZhong}级`,
+    `是否有砖皮：${zhuanPiText}`,
+    `总资产：${totalAsset}m`,
+    `哈弗币：${coin}m`,
+  ];
+  if (armor6 > 0) copyArr.push(`6甲价格：${armorMoney.toFixed(2)}元`);
+  if (head6 > 0) copyArr.push(`6头价格：${headMoney.toFixed(2)}元`);
+  if (awm > 0) copyArr.push(`AWM子弹价格：${awmMoney.toFixed(2)}元`);
+  copyArr.push(`哈弗币出租价格：${coinMoney}元`);
+  copyArr.push(`总出租价格：${total}元`);
+  resultText = copyArr.join('\n');
+
+  // 界面显示：只显示价格
+  let showArr = [];
+  if (armor6 > 0) showArr.push(`6甲价格：${armorMoney.toFixed(2)}元`);
+  if (head6 > 0) showArr.push(`6头价格：${headMoney.toFixed(2)}元`);
+  if (awm > 0) showArr.push(`AWM子弹价格：${awmMoney.toFixed(2)}元`);
+  showArr.push(`哈弗币出租价格：${coinMoney}元`);
+  showArr.push(`总出租价格：${total}元`);
+  showText = showArr.join('\n');
+
+  show();
 }
 
+function show(){
+  document.getElementById('result').innerHTML = showText;
+  document.getElementById('result').style.display = 'block';
+  document.getElementById('copyBtn').style.display = 'block';
+  document.getElementById('fillFormBtn').style.display = 'block';
+}
+
+// 一键复制
 function copyResult() {
-  if (!resultText) return;
-  const textarea = document.createElement('textarea');
-  textarea.value = resultText;
-  document.body.appendChild(textarea);
-  textarea.select();
+  const t = document.createElement('textarea');
+  t.value = resultText;
+  document.body.appendChild(t);
+  t.select();
   document.execCommand('copy');
-  document.body.removeChild(textarea);
+  document.body.removeChild(t);
   alert('✅ 复制成功！');
+}
+
+// 一键填写表单
+function fillToForm() {
+  if(!resultText){alert('❌ 请先计算');return;}
+  const win = window.open(FORM_URL, '_blank');
+  win.onload = () => {
+    const inp = win.document.getElementById(FORM_INPUT_ID);
+    if(inp){ inp.value = resultText; alert('✅ 已自动填写到表单！'); }
+    else alert('❌ 找不到表单输入框');
+  };
 }
 </script>
 </body>
