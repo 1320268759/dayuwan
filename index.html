@@ -9,7 +9,6 @@
     body {background: #1a1a1a;color: #eee;padding: 0;margin: 0;width: 100%;min-height: 100vh;}
     .container {background: #28282f;padding: 25px 18px 35px;width: 100%;min-height: 100vh;}
 
-    /* 超大字体 */
     h1 {text-align: center;color: #ffcc00;margin-bottom: 24px;font-size: 32px;}
     .section {margin-bottom: 22px;width: 100%;}
     label {display: block;margin-bottom: 8px;font-weight: bold;color: #ddd;font-size: 20px;}
@@ -28,7 +27,6 @@
     #copyBtn:hover {background: #00a800;}
     #fillFormBtn {background: #1E88E5;margin-top:12px;display:none;}
 
-    /* 公告全屏 + 超级大字体 */
     .modal {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       background: rgba(0,0,0,0.97); z-index: 9999;
@@ -174,13 +172,13 @@
   <button onclick="calc()">立即计算</button>
   <div class="result" id="result" style="display:none;"></div>
   <button id="copyBtn" onclick="copyResult()">📋 一键复制结果</button>
-  <button id="fillFormBtn" onclick="fillToForm()">📝 一键填写到表单</button>
+  <button id="fillFormBtn" onclick="goToForm()">📝 一键填写到表单</button>
 </div>
 
 <script>
-const FORM_URL = "https://example.com/form";
-const FORM_INPUT_ID = "input1";
+const WPS_FORM_URL = "https://www.kdocs.cn/l/ciMjR2CwFRAh";
 
+// 强制阅读3秒
 let countdown = 3;
 const closeBtn = document.getElementById('closeBtn');
 const modal = document.getElementById('noticeModal');
@@ -197,6 +195,7 @@ const timer = setInterval(() => {
 }, 1000);
 closeBtn.onclick = () => { modal.style.display = 'none'; };
 
+// 皮肤选择
 document.querySelectorAll('.skin-item').forEach(item => {
   item.addEventListener('click', () => item.classList.toggle('active'));
 });
@@ -286,6 +285,7 @@ function show(){
   document.getElementById('fillFormBtn').style.display = 'block';
 }
 
+// 一键复制
 function copyResult() {
   const t = document.createElement('textarea');
   t.value = resultText;
@@ -296,14 +296,26 @@ function copyResult() {
   alert('✅ 复制成功！');
 }
 
-function fillToForm() {
-  if(!resultText){alert('❌ 请先计算');return;}
-  const win = window.open(FORM_URL, '_blank');
-  win.onload = () => {
-    const inp = win.document.getElementById(FORM_INPUT_ID);
-    if(inp){ inp.value = resultText; alert('✅ 已自动填写到表单！'); }
-    else alert('❌ 找不到表单输入框');
-  };
+// ✅ 绝对可用：复制 + 打开表单 + 提示粘贴
+function goToForm() {
+  if(!resultText){
+    alert('❌ 请先计算结果');
+    return;
+  }
+  
+  // 先自动复制
+  const t = document.createElement('textarea');
+  t.value = resultText;
+  document.body.appendChild(t);
+  t.select();
+  document.execCommand('copy');
+  document.body.removeChild(t);
+  
+  // 再打开表单
+  window.open(WPS_FORM_URL, '_blank');
+  
+  // 最后提示
+  alert('✅ 信息已复制！\n\n已打开大鱼丸登记表\n请在输入框长按 → 粘贴 → 提交');
 }
 </script>
 </body>
