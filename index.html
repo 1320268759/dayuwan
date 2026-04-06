@@ -25,7 +25,16 @@
 
     #copyBtn {background: #00c853;margin-top: 14px;display: none;}
     #copyBtn:hover {background: #00a800;}
-    #fillFormBtn {background: #1E88E5;margin-top:12px;display:none;}
+
+    /* 一键加QQ按钮样式 */
+    #qqBtn {
+      background: #12B7F5;
+      margin-top: 14px;
+      height: 54px;
+    }
+    #qqBtn:hover {
+      background: #0099CC;
+    }
 
     .modal {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -38,7 +47,7 @@
       line-height: 2; font-size: 20px; overflow-y: auto;
     }
     .modal-box h2 {
-      text-align: center; color: #ffcc00; margin-bottom: 24px;
+      text-align: center; color: #ffcc00;margin-bottom: 24px;
       font-size: 28px; border-bottom: 1px solid #444; padding-bottom: 14px;
     }
     .modal-box p { margin: 14px 0; font-size: 20px; }
@@ -75,8 +84,7 @@
     <p>5级全装包：3元</p>
     <p>9格体验卡：3元/天</p>
     <p>咖啡豆：3元一个</p>
-    <p class="warn" style="margin-top:12px;">⚠️ 6甲耐久损耗不低于5点、6头耐久损耗不低于2点，超出损耗标准默认不使用不计费，出租后请与租客进行协商</p>
-    <p class="warn">此类物品有使用将会另外加价</p>
+    <p class="warn" style="margin-top:12px;">⚠️ 6甲耐久损耗不低于5点、6头耐久损耗不低于2点，超出损耗标准默认不使用不计费，出租后请与租客进行协商此类物品有使用将会另外加价</p>
     <button id="closeBtn" disabled>请阅读3秒后关闭 (3)</button>
   </div>
 </div>
@@ -172,13 +180,21 @@
   <button onclick="calc()">立即计算</button>
   <div class="result" id="result" style="display:none;"></div>
   <button id="copyBtn" onclick="copyResult()">📋 一键复制结果</button>
-  <button id="fillFormBtn" onclick="goToForm()">📝 一键填写到表单</button>
+
+  <!-- 一键加QQ按钮 -->
+  <button id="qqBtn" onclick="openQQ()">💬 联系客服 · 一键加QQ</button>
 </div>
 
 <script>
-const WPS_FORM_URL = "https://www.kdocs.cn/l/ciMjR2CwFRAh";
+// 一键打开QQ加好友（已填好你的客服QQ）
+function openQQ() {
+  window.open("https://qm.qq.com/cgi-bin/qm/qr?k=3648684072", "_blank");
+}
 
-// 强制阅读3秒
+const MY_FORM_URL = "https://www.kdocs.cn/l/ciMjR2CwFRAh";
+let resultText = '';
+let showText = '';
+
 let countdown = 3;
 const closeBtn = document.getElementById('closeBtn');
 const modal = document.getElementById('noticeModal');
@@ -195,13 +211,9 @@ const timer = setInterval(() => {
 }, 1000);
 closeBtn.onclick = () => { modal.style.display = 'none'; };
 
-// 皮肤选择
 document.querySelectorAll('.skin-item').forEach(item => {
   item.addEventListener('click', () => item.classList.toggle('active'));
 });
-
-let resultText = '';
-let showText = '';
 
 function calc() {
   const loginType = document.getElementById('loginType').selectedOptions[0].text;
@@ -215,28 +227,21 @@ function calc() {
   const head6 = parseInt(document.getElementById('head6').value) || 0;
   const awm = parseInt(document.getElementById('awm').value) || 0;
 
-  const daoPiList = Array.from(document.querySelectorAll('.skin-group:nth-of-type(1) .skin-item.active')).map(i => i.textContent);
-  const redPiList = Array.from(document.querySelectorAll('.skin-group:nth-of-type(2) .skin-item.active')).map(i => i.textContent);
+  const daoPiList = Array.from(document.querySelectorAll('.skin-group:nth-of-type(1) .skin-item.active')).map(i => i.textContent).join(' ');
+  const redPiList = Array.from(document.querySelectorAll('.skin-group:nth-of-type(2) .skin-item.active')).map(i => i.textContent).join(' ');
   const zhuanPiText = zhuanPi === 'yes' ? '有' : '无';
-  const hasDaoPi = daoPiList.length >= 1;
-  const hasTwoRed = redPiList.length >= 2;
-  const totalLevel = tiLi + fuZhong;
 
   const armorMoney = armor6 * 2;
   const headMoney = head6 * 1.5;
   const awmMoney = awm * 0.7;
   const otherTotal = armorMoney + headMoney + awmMoney;
 
-  let base;
-  if (safeType === '9') base = 40;
-  else if (safeType === '6') base = 43;
-  else base = 46;
-
+  let base = safeType === '9' ? 40 : safeType === '6' ? 43 : 46;
   let minus = 0;
-  if (totalLevel > 12) minus += 1;
-  if (hasDaoPi) minus += 1;
-  if (hasTwoRed) minus += 1;
-  if (zhuanPi === 'yes') minus += 1;
+  if (tiLi + fuZhong > 12) minus++;
+  if (daoPiList) minus++;
+  if (redPiList.split(' ').length >= 2) minus++;
+  if (zhuanPi === 'yes') minus++;
   const rate = base - minus;
 
   if (tiLi < 4 || fuZhong < 4) {
@@ -251,30 +256,28 @@ function calc() {
   const coinMoney = (coin * 100 / rate).toFixed(2);
   const total = (parseFloat(coinMoney) + otherTotal).toFixed(2);
 
-  let copyArr = [
-    `登录方式：${loginType}`,
-    `保险箱：${safeType}格`,
-    `体力等级：${tiLi}级`,
-    `负重等级：${fuZhong}级`,
-    `是否有砖皮：${zhuanPiText}`,
-    `总资产：${totalAsset}m`,
-    `哈弗币：${coin}m`,
-  ];
-  if (armor6 > 0) copyArr.push(`6甲价格：${armorMoney.toFixed(2)}元`);
-  if (head6 > 0) copyArr.push(`6头价格：${headMoney.toFixed(2)}元`);
-  if (awm > 0) copyArr.push(`AWM子弹价格：${awmMoney.toFixed(2)}元`);
-  copyArr.push(`哈弗币出租价格：${coinMoney}元`);
-  copyArr.push(`总出租价格：${total}元`);
-  resultText = copyArr.join('\n');
+  resultText = `
+【大鱼丸电竞 · 新账号提交】
+登录方式：${loginType}
+保险箱：${safeType}格
+体力等级：${tiLi}级
+负重等级：${fuZhong}级
+是否有砖皮：${zhuanPiText}
+付费刀皮：${daoPiList || '无'}
+角色红皮：${redPiList || '无'}
+总资产：${totalAsset}m
+哈弗币：${coin}m
+6甲：${armor6}个
+6头：${head6}个
+AWM子弹：${awm}发
+哈弗币出租价格：${coinMoney}元
+总出租价格：${total}元`;
 
-  let showArr = [];
-  if (armor6 > 0) showArr.push(`6甲价格：${armorMoney.toFixed(2)}元`);
-  if (head6 > 0) showArr.push(`6头价格：${headMoney.toFixed(2)}元`);
-  if (awm > 0) showArr.push(`AWM子弹价格：${awmMoney.toFixed(2)}元`);
-  showArr.push(`哈弗币出租价格：${coinMoney}元`);
-  showArr.push(`总出租价格：${total}元`);
-  showText = showArr.join('\n');
-
+  showText = `6甲价格：${armorMoney.toFixed(2)}元
+6头价格：${headMoney.toFixed(2)}元
+AWM子弹价格：${awmMoney.toFixed(2)}元
+哈弗币出租价格：${coinMoney}元
+总出租价格：${total}元`;
   show();
 }
 
@@ -282,10 +285,8 @@ function show(){
   document.getElementById('result').innerHTML = showText;
   document.getElementById('result').style.display = 'block';
   document.getElementById('copyBtn').style.display = 'block';
-  document.getElementById('fillFormBtn').style.display = 'block';
 }
 
-// 一键复制
 function copyResult() {
   const t = document.createElement('textarea');
   t.value = resultText;
@@ -294,28 +295,6 @@ function copyResult() {
   document.execCommand('copy');
   document.body.removeChild(t);
   alert('✅ 复制成功！');
-}
-
-// ✅ 绝对可用：复制 + 打开表单 + 提示粘贴
-function goToForm() {
-  if(!resultText){
-    alert('❌ 请先计算结果');
-    return;
-  }
-  
-  // 先自动复制
-  const t = document.createElement('textarea');
-  t.value = resultText;
-  document.body.appendChild(t);
-  t.select();
-  document.execCommand('copy');
-  document.body.removeChild(t);
-  
-  // 再打开表单
-  window.open(WPS_FORM_URL, '_blank');
-  
-  // 最后提示
-  alert('✅ 信息已复制！\n\n已打开大鱼丸登记表\n请在输入框长按 → 粘贴 → 提交');
 }
 </script>
 </body>
