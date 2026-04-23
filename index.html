@@ -74,7 +74,7 @@
     <p>5级全装包：3元</p>
     <p>9格体验卡：3元/天</p>
     <p>咖啡豆：3元一个</p>
-    <p class="warn" style="margin-top:12px;">⚠️ 6甲耐久损耗不低于5点、6头耐久损耗不低于2点，超出损耗标准默认不使用不计费，出租后请与租客进行协商此类物品有使用将会另外加价</p>
+    <p class="warn" style="margin-top:12px;">⚠️ 6甲耐久损耗不低于5点、6头耐久损耗不低于2点，超出损耗标准默认不使用不计费</p>
     <button id="closeBtn" disabled>请阅读3秒后关闭 (3)</button>
   </div>
 </div>
@@ -124,19 +124,30 @@
   </div>
 
   <div class="section">
-    <label>付费刀皮</label>
-    <div class="skin-group">
-      <div class="skin-item">赤霄</div><div class="skin-item">怜悯</div><div class="skin-item">影锋</div><div class="skin-item">黑海</div>
-      <div class="skin-item">北极星</div><div class="skin-item">信条</div><div class="skin-item">龙牙</div><div class="skin-item">暗星</div>
+    <label>角色红皮</label>
+    <div class="skin-group" id="roleSkins">
+      <div class="skin-item">能天使</div>
+      <div class="skin-item">黑·天际线</div>
+      <div class="skin-item">水墨云图</div>
+      <div class="skin-item">维什戴尔</div>
+      <div class="skin-item">蚀金玫瑰</div>
+      <div class="skin-item">凌霄戍卫</div>
     </div>
     <div class="tip">可多选</div>
   </div>
 
   <div class="section">
-    <label>角色红皮</label>
-    <div class="skin-group">
-      <div class="skin-item">能天使</div><div class="skin-item">黑·天际线</div><div class="skin-item">水墨云图</div>
-      <div class="skin-item">维什戴尔</div><div class="skin-item">蚀金玫瑰</div><div class="skin-item">凌霄戍卫</div>
+    <label>付费刀皮</label>
+    <div class="skin-group" id="weaponSkins">
+      <div class="skin-item">赤霄</div>
+      <div class="skin-item">怜悯</div>
+      <div class="skin-item">影锋</div>
+      <div class="skin-item">黑海</div>
+      <div class="skin-item">北极星</div>
+      <div class="skin-item">信条</div>
+      <div class="skin-item">龙牙</div>
+      <div class="skin-item">暗星</div>
+      <div class="skin-item">坠星者</div>
     </div>
     <div class="tip">可多选</div>
   </div>
@@ -178,7 +189,6 @@ const MY_FORM_URL = "https://www.kdocs.cn/l/ciMjR2CwFRAh";
 let resultText = '';
 let showText = '';
 
-// 缓存DOM节点 提升性能
 const closeBtn = document.getElementById('closeBtn');
 const modal = document.getElementById('noticeModal');
 const resultDom = document.getElementById('result');
@@ -198,7 +208,6 @@ const timer = setInterval(() => {
 }, 1000);
 closeBtn.onclick = () => { modal.style.display = 'none'; };
 
-// 优化皮肤点击事件 减少重绘
 document.querySelectorAll('.skin-item').forEach(item => {
   item.addEventListener('click', () => item.classList.toggle('active'));
 });
@@ -215,8 +224,11 @@ function calc() {
   const head6 = parseInt(document.getElementById('head6').value) || 0;
   const awm = parseInt(document.getElementById('awm').value) || 0;
 
-  const daoPiList = Array.from(document.querySelectorAll('.skin-group:nth-of-type(1) .skin-item.active')).map(i => i.textContent).join(' ');
-  const redPiList = Array.from(document.querySelectorAll('.skin-group:nth-of-type(2) .skin-item.active')).map(i => i.textContent).join(' ');
+  // 精准获取 角色红皮
+  const redPiList = Array.from(document.querySelectorAll('#roleSkins .skin-item.active')).map(i => i.textContent).join(' ') || '无';
+  // 精准获取 付费刀皮
+  const daoPiList = Array.from(document.querySelectorAll('#weaponSkins .skin-item.active')).map(i => i.textContent).join(' ') || '无';
+  
   const zhuanPiText = zhuanPi === 'yes' ? '有' : '无';
 
   const armorMoney = armor6 * 2;
@@ -227,8 +239,8 @@ function calc() {
   let base = safeType === '9' ? 40 : safeType === '6' ? 43 : 46;
   let minus = 0;
   if (tiLi + fuZhong > 12) minus++;
-  if (daoPiList) minus++;
-  if (redPiList.split(' ').length >= 2) minus++;
+  if (daoPiList !== '无') minus++;
+  if (redPiList !== '无') minus++;
   if (zhuanPi === 'yes') minus++;
   const rate = base - minus;
 
@@ -251,8 +263,8 @@ function calc() {
 体力等级：${tiLi}级
 负重等级：${fuZhong}级
 是否有砖皮：${zhuanPiText}
-付费刀皮：${daoPiList || '无'}
-角色红皮：${redPiList || '无'}
+角色红皮：${redPiList}
+付费刀皮：${daoPiList}
 总资产：${totalAsset}m
 哈弗币：${coin}m
 6甲：${armor6}个
